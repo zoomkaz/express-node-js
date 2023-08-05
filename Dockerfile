@@ -1,5 +1,5 @@
 # Node serves as the runtime environment for JavaScript, hence we use it as our base image.
-FROM node:20
+FROM node:20.5
 
 # We set /app as the working directory within the container
 WORKDIR /app
@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 # The rest of the code is copied into the container
-COPY . .
+COPY src/ ./
 
 # Port 3000 is exposed to enable access from outside
 EXPOSE 3000
