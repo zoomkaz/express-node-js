@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 # The rest of the code is copied into the container
-COPY src/ ./
+COPY . .
 
 # Port 3000 is exposed to enable access from outside
 EXPOSE 3000
