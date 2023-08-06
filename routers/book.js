@@ -1,27 +1,10 @@
 const express = require(`express`)
 const router = express.Router()
-const Book = require('../models/models')
-
-const stor = {
-  book: []
-};
-
-[1, 2, 3].map(elem => {
-  const newBook = new Book(
-    `title ${elem}`,
-    `description ${elem}`,
-    `authors ${elem}`,
-    `favorite ${elem}`,
-    `fileCover ${elem}`,
-    `fileName ${elem}`,
-    `fileBook ${elem}`
-  );
-  stor.book.push(newBook)
-})
+const Book = require('../models/book')
 
 
-router.get('/', (req, res) => {
-  const { book } = stor
+router.get('/', async (req, res) => {
+  const book = await Book.find()
   res.render("book/index", {
     title: 'Book',
     book: book
@@ -35,42 +18,60 @@ router.get('/create', (req, res) => {
   });
 });
 
-router.post(`/create`, (req, res, next) => {
-  const { book } = stor
+router.post(`/create`, async (req, res, next) => {
   const {
     title,
     description,
     authors,
     favorite,
     fileCover,
-    fileName,
-    fileBook
+    fileName
   } = req.body
 
-  const newBook = new Book(title, description, authors, favorite, fileCover, fileName, fileBook)
-  book.push(newBook)
+  const newBook = new Book({ title, description, authors, favorite, fileCover, fileName })
 
-  res.statusCode = 201
-  res.redirect('/book')
+  try {
+    await newBook.save()
+    res.status(201).redirect(`/book`)
+  } catch (error) {
+    console.error(error);
+    res.status(500)
+  }
 })
 
-router.get(`/:id`, (req, res) => {
-  const { book } = stor
+router.get(`/:id`, async (req, res) => {
   const { id } = req.params
-  const bookIndex = book.findIndex((elem) => elem.id == id)
 
-  if (bookIndex != -1) {
+  try {
+    const book = await Book.findById(id)
+    res.status(200);
     res.render("book/view", {
       title: 'Book | View',
-      book: book[bookIndex]
+      book: book
     })
-  } else {
+  } catch (error) {
+    console.error(error);
     res.status(404).redirect('/404')
   }
 })
 
-router.get('/update/:id', (req, res) => {
-  const { book } = stor
+router.get('/update/:id', async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const book = await Book.findById(id)
+    res.status(200);
+    res.render("book/update", {
+      title: 'Book | View',
+      book: book
+    })
+  } catch (error) {
+    console.error(error);
+    res.status(404).redirect('/404')
+  }
+})
+
+router.post('/update/:id', async (req, res) => {
   const { id } = req.params
   const {
     title,
@@ -78,75 +79,31 @@ router.get('/update/:id', (req, res) => {
     authors,
     favorite,
     fileCover,
-    fileName,
-    fileBook
+    fileName
   } = req.body
-  const bookIndex = book.findIndex((elem) => elem.id == id)
 
-  if (bookIndex != -1) {
-    book[bookIndex] = {
-      ...book[bookIndex],
-      title,
-      description,
-      authors,
-      favorite,
-      fileCover,
-      fileName,
-      fileBook
-    }
-    res.statusCode = 201
+  try {
+    const book = await Book.findByIdAndUpdate(id, { title, description, authors, favorite, fileCover, fileName })
+    res.status(201);
     res.render('book/update', {
       title: 'Book | Update',
       book: book
     })
-  } else {
-    res.status(404).redirect('/404')
-  }
-})
-
-router.post('/update/:id', (req, res) => {
-  const { book } = stor;
-  const { id } = req.params;
-  const {
-    title,
-    description,
-    authors,
-    favorite,
-    fileCover,
-    fileName,
-    fileBook
-  } = req.body
-  const bookIndex = book.findIndex((elem) => elem.id == id)
-
-  if (bookIndex !== -1) {
-    book[bookIndex] = {
-      ...book[bookIndex],
-      title,
-      description,
-      authors,
-      favorite,
-      fileCover,
-      fileName,
-      fileBook
-    }
-    res.redirect(`/book/${id}`);
-  } else {
-    res.status(404).redirect('/404');
+  } catch (error) {
+    console.error(error);
+    res.status(404).redirect(`/404`)
   }
 });
 
-router.post(`/delete/:id`, (req, res) => {
-  const { book } = stor
+router.post(`/delete/:id`, async (req, res) => {
   const { id } = req.params
-  const bookIndex = book.findIndex(elem => elem.id == id)
 
-  if (bookIndex != -1) {
-    book.splice(bookIndex, 1)
-    res.statusCode = 201
-    res.redirect('/book')
-  } else {
-    res.statusCode = 404
-    res.redirect('/404')
+  try {
+    await Book.deleteOne({ _id: id })
+    res.status(201).redirect(`/book`)
+  } catch (error) {
+    console.error(error);
+    res.status(404).redirect(`/404`)
   }
 })
 

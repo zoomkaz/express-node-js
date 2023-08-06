@@ -27,9 +27,6 @@
             <p class="card-text">
               <%= book.fileName %>.
             </p>
-            <p class="card-text">
-              <%= book.fileBook %>.
-            </p>
 
             <div class="text-right">
               <div class="views d-inline"></div>
@@ -56,7 +53,7 @@
           let b = '<%- JSON.stringify(bookS) %>'
           const current = JSON.parse(b)
           function some() {
-            fetch(`http://localhost:81/counter/${current.id}/incr`, {
+            fetch(`http://localhost:81/counter/${current._id}/incr`, {
               method: `POST`,
               headers: {
                 "Content-Type": "application/json"

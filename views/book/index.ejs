@@ -42,10 +42,10 @@
             </tr>
             <% let book=el %>
               <script>
-                fetch(`http://localhost:81/counter/${JSON.parse('<%- JSON.stringify(book) %>').id}`)
+                fetch(`http://localhost:81/counter/${JSON.parse('<%- JSON.stringify(book) %>')._id}`)
                   .then(res => res.json())
                   .then(data => {
-                    document.querySelector(`.views-${JSON.parse('<%- JSON.stringify(book) %>').id}`).textContent = data.views || 0
+                    document.querySelector(`.views-${JSON.parse('<%- JSON.stringify(book) %>')._id}`).textContent = data.views || 0
                   })
               </script>
               <% }); %>

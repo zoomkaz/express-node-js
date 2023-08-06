@@ -1,68 +1,47 @@
 const express = require(`express`)
 const router = express.Router()
-const Book = require('../../models/models')
+const Book = require(`../../models/book`)
 const fileMiddleware = require(`../../middleware/file`)
 
-const stor = {
-  book: []
-};
-
-[1, 2, 3].map(elem => {
-  const newBook = new Book(
-    `title ${elem}`,
-    `description ${elem}`,
-    `authors ${elem}`,
-    `favorite ${elem}`,
-    `fileCover ${elem}`,
-    `fileName ${elem}`,
-    `fileBook ${elem}`
-  );
-  stor.book.push(newBook)
-})
-
-router.get(`/err`, (req, res) => {
-  throw new Error(`error message`)
-})
-
-router.get('/', (req, res) => {
-  const { book } = stor
+router.get('/', async (req, res) => {
+  const book = await Book.find()
   res.json(book)
 })
 
-router.get(`/:id`, (req, res) => {
-  const { book } = stor
+router.get(`/:id`, async (req, res) => {
   const { id } = req.params
-  const bookIndex = book.findIndex((elem) => elem.id == id)
 
-  if (bookIndex != -1) {
-    res.json(book[bookIndex])
-  } else {
-    res.statusCode = 404
-    res.json("Книга не найдена")
+  try {
+    const book = await Book.findById(id)
+    res.status(200).json(book)
+  } catch (error) {
+    console.error(error)
+    res.status(404).redirect(`/404`)
   }
 })
 
-router.post(`/`, fileMiddleware.any(), (req, res, next) => {
-  const { book } = stor
+router.post(`/`, fileMiddleware.any(), async (req, res, next) => {
   const {
     title,
     description,
     authors,
     favorite,
     fileCover,
-    fileName,
-    fileBook
+    fileName
   } = req.body
 
-  const newBook = new Book(title, description, authors, favorite, fileCover, fileName, fileBook)
-  book.push(newBook)
+  const newBook = new Book({ title, description, authors, favorite, fileCover, fileName })
 
-  res.statusCode = 201
-  res.json(newBook)
+  try {
+    await newBook.save()
+    res.status(201).json(newBook)
+  } catch (error) {
+    res.status(500)
+    console.error(error);
+  }
 })
 
-router.put('/:id', fileMiddleware.any(), (req, res) => {
-  const { book } = stor
+router.put('/:id', fileMiddleware.any(), async (req, res) => {
   const { id } = req.params
   const {
     title,
@@ -70,42 +49,27 @@ router.put('/:id', fileMiddleware.any(), (req, res) => {
     authors,
     favorite,
     fileCover,
-    fileName,
-    fileBook
+    fileName
   } = req.body
-  const bookIndex = book.findIndex((elem) => elem.id == id)
 
-  if (bookIndex != -1) {
-    book[bookIndex] = {
-      ...book[bookIndex],
-      title,
-      description,
-      authors,
-      favorite,
-      fileCover,
-      fileName,
-      fileBook
-    }
-    res.statusCode = 201
-    res.json(book[bookIndex])
-  } else {
-    res.statusCode = 404
-    res.json("Книга не найдена")
+  try {
+    await Book.findByIdAndUpdate(id, { title, description, authors, favorite, fileCover, fileName })
+    res.status(201).redirect(`/book/${id}`)
+  } catch (error) {
+    console.error(error);
+    res.status(404).redirect(`/404`)
   }
 })
 
-router.delete(`/:id`, (req, res) => {
-  const { book } = stor
+router.delete(`/:id`, async (req, res) => {
   const { id } = req.params
-  const bookIndex = book.findIndex(elem => elem.id == id)
 
-  if (bookIndex != -1) {
-    book.splice(bookIndex, 1)
-    res.statusCode = 201
-    res.json('ok')
-  } else {
-    res.statusCode = 404
-    res.json('Книга не найдена')
+  try {
+    await Book.deleteOne({ _id: id })
+    res.status(201).json('ok')
+  } catch (error) {
+    console.error(error);
+    res.status(404).redirect(`/404`)
   }
 })
 

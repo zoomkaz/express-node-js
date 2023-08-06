@@ -1,5 +1,6 @@
 const express = require(`express`);
 require(`dotenv`).config();
+const mongoose = require(`mongoose`)
 
 const app = express()
 
@@ -34,7 +35,27 @@ app.use((err, req, res, next) => {
 })
 
 const PORT = process.env.PORT || 3000;
+const UserDB = process.env.DB_USERNAME || 'root';
+const PasswordDB = process.env.DB_PASSWORD || 'qwerty12345';
+const NameDB = process.env.DB_NAME || 'books';
+const HostDB = process.env.DB_HOST || 'mongodb://localhost:27017/mydb';
 
-app.listen(PORT, () => {
-  console.log(`Server running at port: ${PORT}`);
-})
+async function start() {
+  try {
+    await mongoose.connect(HostDB, {
+      user: UserDB,
+      pass: PasswordDB,
+      dbName: NameDB,
+      useUnifiedTopology: true
+    });
+
+    app.listen(PORT, () => {
+      console.log(`Server running at port: ${PORT}`);
+    })
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+start();
