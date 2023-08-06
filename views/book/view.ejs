@@ -32,6 +32,8 @@
             </p>
 
             <div class="text-right">
+              <div class="views d-inline"></div>
+              <i class="fa fa-eye" aria-hidden="true"></i>
               <a class="btn btn-sm btn-primary" href="/book/update/<%= book.id %>">
                 <i class="fa fa-pencil" aria-hidden="true"></i>
               </a>
@@ -48,3 +50,23 @@
     </div>
 
     <%- include("../partials/layout-end") %>
+
+      <% let bookS=book %>
+        <script>
+          let b = '<%- JSON.stringify(bookS) %>'
+          const current = JSON.parse(b)
+          function some() {
+            fetch(`http://localhost:81/counter/${current.id}/incr`, {
+              method: `POST`,
+              headers: {
+                "Content-Type": "application/json"
+              }
+            }).then(res => res.json())
+              .then(data => {
+                views = data.views
+                let doc = document.querySelector(`.views`);
+                doc.textContent = views
+              })
+          }
+          some()
+        </script>

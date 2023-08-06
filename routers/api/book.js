@@ -112,7 +112,6 @@ router.delete(`/:id`, (req, res) => {
 router.post(`/upload-img`, fileMiddleware.single('cover-img'), (req, res) => {
   if (req.file) {
     const { path } = req.file
-    console.log(path);
     res.json(path)
   } else {
     res.json(null)

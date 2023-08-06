@@ -37,7 +37,6 @@ router.get('/create', (req, res) => {
 
 router.post(`/create`, (req, res, next) => {
   const { book } = stor
-  console.log(req.body);
   const {
     title,
     description,

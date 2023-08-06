@@ -1,0 +1,20 @@
+services:
+  book:
+    build: .
+    ports:
+      - 80:3000
+    environment:
+      - PORT=3000
+      - REDIS_URL=redis://storage
+  storage:
+    image: redis
+  counter:
+    build: ./apps/counter/
+    ports:
+      - 81:3001
+    environment:
+      - PORT=3001
+      - REDIS_URL=redis://storage
+    depends_on:
+      - book
+      - storage

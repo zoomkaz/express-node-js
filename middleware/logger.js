@@ -2,7 +2,6 @@ const fs = require(`fs`)
 const os = require(`os`)
 
 module.exports = (req, res, next) => {
-  console.log(req.header("x-forwarded-for"));
   let now = new Date()
   let hour = now.getHours()
   let minutes = now.getMinutes()

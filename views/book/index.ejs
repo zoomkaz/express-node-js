@@ -25,6 +25,8 @@
                 <%= el.title %>
               </td>
               <td class="text-right">
+                <div class='views-<%= el.id %> d-inline '></div>
+                <i class="fa fa-eye" aria-hidden="true"></i>
                 <a class="btn btn-sm btn-success" href="/book/<%= el.id %>">
                   <i class="fa fa-eye" aria-hidden="true"></i>
                 </a>
@@ -38,7 +40,15 @@
                 </form>
               </td>
             </tr>
-            <% }); %>
+            <% let book=el %>
+              <script>
+                fetch(`http://localhost:81/counter/${JSON.parse('<%- JSON.stringify(book) %>').id}`)
+                  .then(res => res.json())
+                  .then(data => {
+                    document.querySelector(`.views-${JSON.parse('<%- JSON.stringify(book) %>').id}`).textContent = data.views || 0
+                  })
+              </script>
+              <% }); %>
         </tbody>
       </table>
 
